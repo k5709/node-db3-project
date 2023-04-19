@@ -147,8 +147,11 @@ async function findSteps(scheme_id) {
     .where("sc.scheme_id", scheme_id)
     .orderBy("step_number");
 
-  if (!rows[0].step_id) return rows;
-  return rows;
+  if (rows.some((row) => row.step_id !== null)) {
+    return rows;
+  } else {
+    return [];
+  }
 }
 
 function add(scheme) {
