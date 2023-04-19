@@ -12,6 +12,7 @@ const checkSchemeId = async (req, res, next) => {
     const existing = await db("schemes")
       .where("scheme_id", req.params.scheme_id)
       .first();
+
     if (!existing) {
       next({
         status: 404,
@@ -34,17 +35,15 @@ const checkSchemeId = async (req, res, next) => {
   }
 */
 const validateScheme = async (req, res, next) => {
-  try {
-    const schemeName = req.body.scheme_name;
-    if (
-      !schemeName ||
-      schemeName === undefined ||
-      typeof req.body.scheme_name !== "string"
-    ) {
-      next({ status: 400, message: "invalid scheme_name" });
-    }
-  } catch (err) {
-    next(err);
+  const { scheme_name } = req.body;
+  if (
+    scheme_name === undefined ||
+    typeof scheme_name !== "string" ||
+    !scheme_name.trim()
+  ) {
+    next({ status: 400, message: "invalid scheme_name" });
+  } else {
+    next();
   }
 };
 
@@ -58,16 +57,19 @@ const validateScheme = async (req, res, next) => {
   }
 */
 const validateStep = (req, res, next) => {
-  const instructions = req.body.instructions;
-  const step_number = req.body.step_number;
+  const { instructions, step_number } = req.body;
+
   if (
-    !instructions ||
+    instructions === undefined ||
     typeof instructions !== "string" ||
-    instructions === undefined
+    !instructions.trim() ||
+    typeof step_number !== "number" ||
+    step_number < 1
   ) {
-    next({ status: 400, message: "invalid step" });
-  } else if (typeof step_number !== "number" || step_number < 1) {
-    next({ status: 400, message: "invalid step" });
+    const error = { status: 400, message: "invalid step" };
+    next(error);
+  } else {
+    next();
   }
 };
 
